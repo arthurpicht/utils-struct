@@ -10,18 +10,15 @@ import static org.junit.jupiter.api.Assertions.*;
 class TopologicalSortValidatorTest {
 
     private Dag<String> createDag() {
-        Dag<String> dag = new Dag<>();
-
-        dag.addNode("Düsseldorf");
-        dag.addNode("Frankfurt");
-        dag.addNode("Berlin");
-        dag.addNode("Hamburg");
-
-        dag.addEdge("Düsseldorf", "Frankfurt");
-        dag.addEdge("Frankfurt", "Berlin");
-        dag.addEdge("Frankfurt", "Hamburg");
-
-        return dag;
+        return new DagBuilder<String>()
+                .withNode("Düsseldorf")
+                .withNode("Frankfurt")
+                .withNode("Berlin")
+                .withNode("Hamburg")
+                .withEdge("Düsseldorf", "Frankfurt")
+                .withEdge("Frankfurt", "Berlin")
+                .withEdge("Frankfurt", "Hamburg")
+                .build();
     }
 
     @Test

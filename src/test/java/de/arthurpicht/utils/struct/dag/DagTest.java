@@ -13,16 +13,15 @@ class DagTest {
     @Test
     void simple() {
 
-        Dag<String> dag = new Dag<>();
-
-        dag.addNode("Düsseldorf");
-        dag.addNode("Frankfurt");
-        dag.addNode("Berlin");
-        dag.addNode("Hamburg");
-
-        dag.addEdge("Düsseldorf", "Frankfurt");
-        dag.addEdge("Frankfurt", "Berlin");
-        dag.addEdge("Frankfurt", "Hamburg");
+        Dag<String> dag = new DagBuilder<String>()
+                .withNode("Düsseldorf")
+                .withNode("Frankfurt")
+                .withNode("Berlin")
+                .withNode("Hamburg")
+                .withEdge("Düsseldorf", "Frankfurt")
+                .withEdge("Frankfurt", "Berlin")
+                .withEdge("Frankfurt", "Hamburg")
+                .build();
 
         Assertions.assertTrue(dag.isSource("Düsseldorf"));
         Assertions.assertFalse(dag.isSink("Düsseldorf"));

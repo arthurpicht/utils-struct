@@ -9,20 +9,19 @@ class TopologicalSortTest {
     @Test
     void simple() {
 
-        Dag<String> dag = new Dag<>();
-
-        dag.addNode("A");
-        dag.addNode("B");
-        dag.addNode("C1");
-        dag.addNode("C2");
-        dag.addNode("D1");
-        dag.addNode("D2");
-
-        dag.addEdge("A", "B");
-        dag.addEdge("B", "C1");
-        dag.addEdge("B", "C2");
-        dag.addEdge("C1", "D1");
-        dag.addEdge("C1", "D2");
+        Dag<String> dag = new DagBuilder<String>()
+                .withNode("A")
+                .withNode("B")
+                .withNode("C1")
+                .withNode("C2")
+                .withNode("D1")
+                .withNode("D2")
+                .withEdge("A", "B")
+                .withEdge("B", "C1")
+                .withEdge("B", "C2")
+                .withEdge("C1", "D1")
+                .withEdge("C1", "D2")
+                .build();
 
         TopologicalSort<String> topologicalSort = new TopologicalSort<>(dag, "A");
         List<String> topologicalSortedNodes = topologicalSort.getTopologicalSortedNodes();

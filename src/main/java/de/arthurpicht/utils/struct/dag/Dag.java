@@ -1,6 +1,5 @@
 package de.arthurpicht.utils.struct.dag;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -8,22 +7,27 @@ import java.util.stream.Collectors;
 public class Dag<N> {
 
     private final Map<N, DagNode<N>> dagNodeMap;
+    private final Set<Edge<N>> edgeSet;
 
-    public Dag() {
-        this.dagNodeMap = new HashMap<>();
+    public Dag(Map<N, DagNode<N>> dagNodeMap, Set<Edge<N>> edgeSet) {
+        this.dagNodeMap = dagNodeMap;
+        this.edgeSet = edgeSet;
     }
 
-    public void addNode(N node) {
-        if (this.dagNodeMap.containsKey(node)) throw new PreexistingDagNodeException(node);
-        DagNode<N> dagNode = new DagNode<>(node);
-        this.dagNodeMap.put(node, dagNode);
+    public Set<N> getAllNodes() {
+        return this.dagNodeMap.keySet();
     }
 
-    public void addEdge(N fromNode, N toNode) {
-        DagNode<N> dagNodeFrom = getDagNode(fromNode);
-        DagNode<N> dagNodeTo = getDagNode(toNode);
-        dagNodeFrom.addDownstreamNode(dagNodeTo);
-        dagNodeTo.addUpstreamNodes(dagNodeFrom);
+    public int getNrOfNodes() {
+        return this.dagNodeMap.size();
+    }
+
+    public Set<Edge<N>> getAllEdges() {
+        return this.edgeSet;
+    }
+
+    public int getNrOfEdges() {
+        return this.edgeSet.size();
     }
 
     public Set<N> getDownstreamNodes(N node) {

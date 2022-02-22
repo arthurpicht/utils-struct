@@ -2,14 +2,16 @@ package de.arthurpicht.utils.struct.dag;
 
 import java.util.Objects;
 
-public class DirectedEdge<N> {
+import static de.arthurpicht.utils.core.assertion.AssertMethodPrecondition.parameterNotNull;
+
+public class Edge<N> {
 
     private final N from;
     private final N to;
 
-    public DirectedEdge(N from, N to) {
-        if (from == null) throw new IllegalArgumentException("Parameter [from] is both null.");
-        if (from == to) throw new IllegalArgumentException("Parameter [to] is both null.");
+    public Edge(N from, N to) {
+        parameterNotNull("from", from);
+        parameterNotNull("to", to);
         this.from = from;
         this.to = to;
     }
@@ -26,7 +28,7 @@ public class DirectedEdge<N> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        DirectedEdge<?> that = (DirectedEdge<?>) o;
+        Edge<?> that = (Edge<?>) o;
         return Objects.equals(from, that.from) && Objects.equals(to, that.to);
     }
 
