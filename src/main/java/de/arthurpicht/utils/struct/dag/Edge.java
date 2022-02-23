@@ -25,6 +25,11 @@ public class Edge<N> {
     }
 
     @Override
+    public String toString() {
+        return Edge.class.getSimpleName() + " [" + this.from + "] -> [" + this.to + "]";
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

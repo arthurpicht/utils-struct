@@ -1,17 +1,20 @@
 package de.arthurpicht.utils.struct.dag;
 
+import de.arthurpicht.utils.core.collection.Maps;
+
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class Dag<N> {
+public final class Dag<N> {
 
     private final Map<N, DagNode<N>> dagNodeMap;
     private final Set<Edge<N>> edgeSet;
 
     public Dag(Map<N, DagNode<N>> dagNodeMap, Set<Edge<N>> edgeSet) {
-        this.dagNodeMap = dagNodeMap;
-        this.edgeSet = edgeSet;
+        this.dagNodeMap = Maps.immutableMap(dagNodeMap);
+        this.edgeSet = Collections.unmodifiableSet(edgeSet);
     }
 
     public Set<N> getAllNodes() {
@@ -68,6 +71,10 @@ public class Dag<N> {
 
     private Set<N>mapToContent(Set<DagNode<N>>dagNodes) {
         return dagNodes.stream().map(DagNode::getContent).collect(Collectors.toUnmodifiableSet());
+    }
+
+    public boolean containsEdge(N from, N to) {
+        return this.edgeSet.contains(new Edge<>(from, to));
     }
 
 }
