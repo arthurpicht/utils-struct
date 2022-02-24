@@ -2,6 +2,8 @@ package de.arthurpicht.utils.struct.dag;
 
 import de.arthurpicht.utils.core.collection.Sets;
 import de.arthurpicht.utils.core.strings.Strings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -39,6 +41,8 @@ public class TopologicalSort<N> {
             return this.node.toString() + ":" + this.nodeStatus.toString();
         }
     }
+
+    private final Logger logger = LoggerFactory.getLogger(TopologicalSort.class);
 
     private enum NodeStatus { NEW, IN_PROCESS, FINISHED }
 
@@ -86,15 +90,15 @@ public class TopologicalSort<N> {
             this.currentStackNode = nodesStack.pop();
             this.currentNode = currentStackNode.getNode();
 
-            System.out.println("Process         : " + currentStackNode);
+            logger.trace("Process         : " + currentStackNode);
 
             Set<N> nodeOptions = getTraversalOptions();
 
-            System.out.println("nodeStack       : " + Strings.listing(Collections.list(nodesStack.elements()), ", "));
-            System.out.println("currentNode     : " + currentNode);
-            System.out.println("lastVisitedNode : " + lastVisitedStackNode);
-            System.out.println("nodeOptions     : " + Strings.listing(nodeOptions, ", "));
-            System.out.println("mutedEdges      : " + Strings.listing(mutedEdges, ", "));
+            logger.trace("nodeStack       : " + Strings.listing(Collections.list(nodesStack.elements()), ", "));
+            logger.trace("currentNode     : " + currentNode);
+            logger.trace("lastVisitedNode : " + lastVisitedStackNode);
+            logger.trace("nodeOptions     : " + Strings.listing(nodeOptions, ", "));
+            logger.trace("mutedEdges      : " + Strings.listing(mutedEdges, ", "));
 
             if (currentStackNode.nodeStatus == NodeStatus.NEW) {
 
@@ -122,8 +126,8 @@ public class TopologicalSort<N> {
             }
 
 
-            System.out.println("sorted nodes    : " + Strings.listing(this.topologicalSortedNodes, ", "));
-            System.out.println("----------------------------------");
+            logger.trace("sorted nodes    : " + Strings.listing(this.topologicalSortedNodes, ", "));
+            logger.trace("----------------------------------");
         }
     }
 
@@ -136,7 +140,7 @@ public class TopologicalSort<N> {
     }
 
     private void processSink(boolean backDirection) {
-        System.out.println("No downstream edges.");
+        logger.trace("No downstream edges.");
         addToSorted(this.currentNode);
         if (this.lastVisitedStackNode == null) throw new IllegalStateException();
         Edge<N> edgeToMute;
@@ -146,31 +150,31 @@ public class TopologicalSort<N> {
             edgeToMute = new Edge<>(this.lastVisitedStackNode.node, currentNode);
         }
         this.mutedEdges.add(edgeToMute);
-        System.out.println("mute edge       : " + edgeToMute);
+        logger.trace("mute edge       : " + edgeToMute);
     }
 
     private void processNodeWithDownstreamEdges(Set<N> nodeOptions) {
-        System.out.println("With downstream edges.");
+        logger.trace("With downstream edges.");
         N someOption = Sets.getSomeElement(nodeOptions);
         this.nodesStack.push(StackNode.createInstanceInProcess(this.currentNode));
         this.nodesStack.push(StackNode.createInstanceNew(someOption));
 
-        System.out.println("push to stack   : " + this.currentNode + ":IN_PROCESS");
-        System.out.println("push to stack   : " + someOption + ":NEW");
+        logger.trace("push to stack   : " + this.currentNode + ":IN_PROCESS");
+        logger.trace("push to stack   : " + someOption + ":NEW");
     }
 
     private void processFinishedNode(Set<N> nodeOptions) {
-        System.out.println("Process finished Node: " + this.lastVisitedStackNode.node);
+        logger.trace("Process finished Node: " + this.lastVisitedStackNode.node);
         Edge<N> edge = new Edge<>(this.currentNode, this.lastVisitedStackNode.node);
         this.mutedEdges.add(edge);
-        System.out.println("mute edge       : " + edge);
+        logger.trace("mute edge       : " + edge);
         nodeOptions.remove(this.lastVisitedStackNode.node);
     }
 
     private void addToSorted(N node) {
         if (!this.topologicalSortedNodes.contains(node)) {
             this.topologicalSortedNodes.add(0, node);
-            System.out.println("addToSorted     : " + node);
+            logger.trace("addToSorted     : " + node);
         }
     }
 
