@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class TopologicalSort<N> {
+public class AcyclicValidator<N> {
 
     private static final class StackNode<N> {
 
@@ -42,13 +42,22 @@ public class TopologicalSort<N> {
         }
     }
 
-    private final Logger logger = LoggerFactory.getLogger(TopologicalSort.class);
+    private static final class CycleException extends Exception {
+        public CycleException() {
+            super();
+        }
+    }
+
+
+    private final Logger logger = LoggerFactory.getLogger(AcyclicValidator.class);
 
     private enum NodeStatus { NEW, IN_PROCESS, FINISHED }
 
     private final Dag<N> dag;
     private final N startNode;
-    private final List<N> topologicalSortedNodes;
+    private boolean acyclic;
+    private List<N> cycleNodeList;
+    private String message;
 
     private final Set<Edge<N>> mutedEdges;
     private final Stack<StackNode<N>> nodesStack;
@@ -56,11 +65,11 @@ public class TopologicalSort<N> {
     private StackNode<N> lastVisitedStackNode;
     private N currentNode;
 
-    public static <N> List<N> get(Dag<N> dag, N startNode) {
-        return new TopologicalSort<N>(dag, startNode).getTopologicalSortedNodes();
+    public static <N> boolean validate(Dag<N> dag, N startNode) {
+        return new AcyclicValidator<>(dag, startNode).isAcyclic();
     }
 
-    public TopologicalSort(Dag<N> dag, N startNode) {
+    public AcyclicValidator(Dag<N> dag, N startNode) {
         if (!dag.contains(startNode)) throw new UnknownDagNodeException(startNode);
         this.dag = dag;
         this.startNode = startNode;
@@ -71,15 +80,20 @@ public class TopologicalSort<N> {
         this.currentStackNode = null;
         this.currentNode = null;
 
-        this.topologicalSortedNodes = new ArrayList<>();
+        this.acyclic = true;
+        this.cycleNodeList = new ArrayList<>();
+        this.message = "";
 
-        sort();
+        try {
+            sort();
+        } catch (CycleException e) {
+            this.acyclic = false;
+        }
     }
 
-    private void sort() {
+    private void sort() throws CycleException {
 
         if (this.dag.getDownstreamNodes(this.startNode).isEmpty()) {
-            this.topologicalSortedNodes.add(this.startNode);
             return;
         }
 
@@ -125,7 +139,6 @@ public class TopologicalSort<N> {
                 }
             }
 
-            logger.trace("sorted nodes    : " + Strings.listing(this.topologicalSortedNodes, ", "));
             logger.trace("----------------------------------");
         }
     }
@@ -140,7 +153,6 @@ public class TopologicalSort<N> {
 
     private void processSink(boolean backDirection) {
         logger.trace("No downstream edges.");
-        addToSorted(this.currentNode);
         if (this.lastVisitedStackNode == null) throw new IllegalStateException();
         Edge<N> edgeToMute;
         if (backDirection) {
@@ -152,9 +164,12 @@ public class TopologicalSort<N> {
         logger.trace("mute edge       : " + edgeToMute);
     }
 
-    private void processNodeWithDownstreamEdges(Set<N> nodeOptions) {
+    private void processNodeWithDownstreamEdges(Set<N> nodeOptions) throws CycleException {
         logger.trace("With downstream edges.");
         N someOption = Sets.getSomeElement(nodeOptions);
+
+        checkForCycle(someOption);
+
         this.nodesStack.push(StackNode.createInstanceInProcess(this.currentNode));
         this.nodesStack.push(StackNode.createInstanceNew(someOption));
 
@@ -170,23 +185,38 @@ public class TopologicalSort<N> {
         nodeOptions.remove(this.lastVisitedStackNode.node);
     }
 
-    private void addToSorted(N node) {
-        if (!this.topologicalSortedNodes.contains(node)) {
-            this.topologicalSortedNodes.add(0, node);
-            logger.trace("addToSorted     : " + node);
-        }
-    }
-
-    public List<N> getTopologicalSortedNodes() {
-        return Collections.unmodifiableList(this.topologicalSortedNodes);
-    }
-
     private Set<N> getTraversalOptions() {
         return this.dag.getDownstreamNodes(this.currentNode).stream()
                 .map(n -> new Edge<>(this.currentNode, n))
                 .filter(n -> !this.mutedEdges.contains(n))
                 .map(Edge::getTo)
                 .collect(Collectors.toSet());
+    }
+
+    private void checkForCycle(N node) throws CycleException {
+        List<N> stackAsNodeList = this.nodesStack.stream()
+                .map(StackNode::getNode)
+                .collect(Collectors.toUnmodifiableList());
+        if (stackAsNodeList.contains(node)) {
+            int index = stackAsNodeList.indexOf(node);
+            this.cycleNodeList = Utils.sublist(stackAsNodeList, index);
+            this.cycleNodeList.add(this.currentNode);
+            this.cycleNodeList.add(this.cycleNodeList.get(0));
+            this.message = "cycle: " + Strings.listing(this.cycleNodeList, ", ");
+            throw new CycleException();
+        }
+    }
+
+    public boolean isAcyclic() {
+        return this.acyclic;
+    }
+
+    public String getMessage() {
+        return this.message;
+    }
+
+    public List<N> getCycleNodeList() {
+        return Collections.unmodifiableList(this.cycleNodeList);
     }
 
 }
