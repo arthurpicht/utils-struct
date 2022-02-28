@@ -1,9 +1,11 @@
 package de.arthurpicht.utils.struct.dag;
 
-import de.arthurpicht.utils.core.assertion.AssertMethodPrecondition;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import static de.arthurpicht.utils.core.assertion.MethodPreconditions.assertArgumentNotNull;
 
 public final class DagBuilder<N> {
 
@@ -16,7 +18,7 @@ public final class DagBuilder<N> {
     }
 
     public DagBuilder<N> withNode(N node) {
-        AssertMethodPrecondition.parameterNotNull("node", node);
+        assertArgumentNotNull("node", node);
         if (this.dagNodeMap.containsKey(node)) throw new PreexistingDagNodeException(node);
         DagNode<N> dagNode = new DagNode<>(node);
         this.dagNodeMap.put(node, dagNode);
@@ -24,8 +26,8 @@ public final class DagBuilder<N> {
     }
 
     public DagBuilder<N> withEdge(N fromNode, N toNode) {
-        AssertMethodPrecondition.parameterNotNull("fromNode", fromNode);
-        AssertMethodPrecondition.parameterNotNull("toNode", toNode);
+        assertArgumentNotNull("fromNode", fromNode);
+        assertArgumentNotNull("toNode", toNode);
         DagNode<N> dagNodeFrom = getDagNode(fromNode);
         DagNode<N> dagNodeTo = getDagNode(toNode);
         dagNodeFrom.addDownstreamNode(dagNodeTo);

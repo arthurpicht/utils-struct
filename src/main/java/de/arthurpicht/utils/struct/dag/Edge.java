@@ -2,7 +2,7 @@ package de.arthurpicht.utils.struct.dag;
 
 import java.util.Objects;
 
-import static de.arthurpicht.utils.core.assertion.AssertMethodPrecondition.parameterNotNull;
+import static de.arthurpicht.utils.core.assertion.MethodPreconditions.assertArgumentNotNull;
 
 public class Edge<N> {
 
@@ -10,8 +10,8 @@ public class Edge<N> {
     private final N to;
 
     public Edge(N from, N to) {
-        parameterNotNull("from", from);
-        parameterNotNull("to", to);
+        assertArgumentNotNull("from", from);
+        assertArgumentNotNull("to", to);
         this.from = from;
         this.to = to;
     }

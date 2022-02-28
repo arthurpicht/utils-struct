@@ -11,7 +11,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.arthurpicht:utils-core:1.6.0'
+    implementation 'com.github.arthurpicht:utils-core:1.7.0'
     implementation 'org.slf4j:slf4j-api:1.7.36'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'

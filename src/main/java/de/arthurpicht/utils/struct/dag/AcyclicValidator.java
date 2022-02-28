@@ -1,5 +1,6 @@
 package de.arthurpicht.utils.struct.dag;
 
+import de.arthurpicht.utils.core.collection.Lists;
 import de.arthurpicht.utils.core.collection.Sets;
 import de.arthurpicht.utils.core.strings.Strings;
 import org.slf4j.Logger;
@@ -199,7 +200,7 @@ public class AcyclicValidator<N> {
                 .collect(Collectors.toUnmodifiableList());
         if (stackAsNodeList.contains(node)) {
             int index = stackAsNodeList.indexOf(node);
-            this.cycleNodeList = Utils.sublist(stackAsNodeList, index);
+            this.cycleNodeList = Lists.sublist(stackAsNodeList, index);
             this.cycleNodeList.add(this.currentNode);
             this.cycleNodeList.add(this.cycleNodeList.get(0));
             this.message = "cycle: " + Strings.listing(this.cycleNodeList, ", ");
