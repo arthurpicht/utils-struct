@@ -66,8 +66,32 @@ public class AcyclicValidator<N> {
     private StackNode<N> lastVisitedStackNode;
     private N currentNode;
 
-    public static <N> boolean validate(Dag<N> dag, N startNode) {
-        return new AcyclicValidator<>(dag, startNode).isAcyclic();
+    /**
+     * Validates a sub-dag starting with specified startNode as root node.
+     *
+     * @param dag the dag to be validated
+     * @param startNode the node to start validation from as root of sub-dag
+     * @param <N> type of dag elements
+     * @throws DagCycleException if a cycle was found
+     */
+    public static <N> void validate(Dag<N> dag, N startNode) throws DagCycleException {
+        AcyclicValidator<N> validator = new AcyclicValidator<>(dag, startNode);
+        if (!validator.isAcyclic())
+            throw new DagCycleException(validator.getCycleNodeListToString());
+    }
+
+    /**
+     * Validates the whole dag.
+     *
+     * @param dag the dag to be validated
+     * @param <N> type of dag elements
+     * @throws DagCycleException if a cycle was found
+     */
+    public static <N> void validate(Dag<N> dag) throws DagCycleException {
+        Set<N> allSourceNodes = dag.getAllSources();
+        for (N node : allSourceNodes) {
+            validate(dag, node);
+        }
     }
 
     public AcyclicValidator(Dag<N> dag, N startNode) {
@@ -218,6 +242,12 @@ public class AcyclicValidator<N> {
 
     public List<N> getCycleNodeList() {
         return Collections.unmodifiableList(this.cycleNodeList);
+    }
+
+    public List<String> getCycleNodeListToString() {
+        return this.cycleNodeList.stream()
+                .map(Object::toString)
+                .collect(Collectors.toUnmodifiableList());
     }
 
 }

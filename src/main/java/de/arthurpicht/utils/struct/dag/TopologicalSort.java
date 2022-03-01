@@ -181,6 +181,12 @@ public class TopologicalSort<N> {
         return Collections.unmodifiableList(this.topologicalSortedNodes);
     }
 
+    public List<N> getTopologicalSortedNodesInReversedOrder() {
+        List<N> sortedNodes = new ArrayList<>(getTopologicalSortedNodes());
+        Collections.reverse(sortedNodes);
+        return sortedNodes;
+    }
+
     private Set<N> getTraversalOptions() {
         return this.dag.getDownstreamNodes(this.currentNode).stream()
                 .map(n -> new Edge<>(this.currentNode, n))

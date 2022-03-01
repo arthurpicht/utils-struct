@@ -3,6 +3,7 @@ package de.arthurpicht.utils.struct.dag;
 import de.arthurpicht.utils.core.collection.Maps;
 
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -62,6 +63,18 @@ public final class Dag<N> {
 
     public boolean contains(N node) {
         return this.dagNodeMap.containsKey(node);
+    }
+
+    public Set<N> getAllSources() {
+        return this.getAllNodes().stream()
+                .filter(this::isSource)
+                .collect(Collectors.toUnmodifiableSet());
+    }
+
+    public Set<N> getAllSinks() {
+        return this.getAllNodes().stream()
+                .filter(this::isSink)
+                .collect(Collectors.toUnmodifiableSet());
     }
 
     private DagNode<N> getDagNode(N node) {
