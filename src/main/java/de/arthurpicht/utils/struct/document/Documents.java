@@ -14,7 +14,7 @@ import static de.arthurpicht.utils.core.assertion.MethodPreconditions.assertArgu
 
 public class Documents {
 
-    public static DocumentInterface createFrom(Path file) throws IOException {
+    public static Document createFrom(Path file) throws IOException {
         assertArgumentNotNull("file", file);
         if (!FileUtils.isExistingRegularFile(file))
             throw new IllegalArgumentException("File not found: [" + file.toAbsolutePath() + "].");
@@ -23,7 +23,7 @@ public class Documents {
         return new Document(lines);
     }
 
-    public static DocumentInterface createFrom(Path file, Charset charset) throws IOException {
+    public static Document createFrom(Path file, Charset charset) throws IOException {
         assertArgumentNotNull("file", file);
         assertArgumentNotNull("charset", charset);
         if (!FileUtils.isExistingRegularFile(file))
@@ -33,7 +33,7 @@ public class Documents {
         return new Document(lines);
     }
 
-    public static DocumentInterface createFrom(InputStream inputStream) throws IOException {
+    public static Document createFrom(InputStream inputStream) throws IOException {
         assertArgumentNotNull("inputStream", inputStream);
 
         List<String> lines = InputStreams.toStrings(inputStream);
