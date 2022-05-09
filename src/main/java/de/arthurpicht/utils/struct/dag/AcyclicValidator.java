@@ -89,6 +89,8 @@ public class AcyclicValidator<N> {
      */
     public static <N> void validate(Dag<N> dag) throws DagCycleException {
         Set<N> allSourceNodes = dag.getAllSources();
+        if (allSourceNodes.size() == 0)
+            throw DagCycleException.createInstanceForMessageOnly("Dag is a cycle. No nodes without an upstream found.");
         for (N node : allSourceNodes) {
             validate(dag, node);
         }

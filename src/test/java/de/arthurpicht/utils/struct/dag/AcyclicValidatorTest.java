@@ -23,6 +23,36 @@ class AcyclicValidatorTest {
     }
 
     @Test
+    void simplePos2() {
+        Dag<String> dag = new DagBuilder<String>()
+                .withNode("A")
+                .withNode("B")
+                .withNode("C")
+                .withEdge("A", "B")
+                .withEdge("B", "C")
+                .withEdge("C", "A")
+                .build();
+
+        AcyclicValidator<String> validator = new AcyclicValidator<>(dag, "A");
+        assertFalse(validator.isAcyclic());
+        System.out.println(validator.getMessage());
+    }
+
+    @Test
+    void simplePos2WithConvenientMethod() {
+        Dag<String> dag = new DagBuilder<String>()
+                .withNode("A")
+                .withNode("B")
+                .withNode("C")
+                .withEdge("A", "B")
+                .withEdge("B", "C")
+                .withEdge("C", "A")
+                .build();
+
+        assertThrows(DagCycleException.class, () -> AcyclicValidator.validate(dag));
+    }
+
+    @Test
     void simplePosCircle() {
         Dag<String> dag = new DagBuilder<String>()
                 .withNode("A")
